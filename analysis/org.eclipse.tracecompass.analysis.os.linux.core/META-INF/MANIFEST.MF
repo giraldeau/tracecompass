@@ -20,4 +20,10 @@ Export-Package: org.eclipse.tracecompass.analysis.os.linux.core.cpuusage,
  org.eclipse.tracecompass.analysis.os.linux.core.model,
  org.eclipse.tracecompass.analysis.os.linux.core.trace,
  org.eclipse.tracecompass.internal.analysis.os.linux.core;x-internal:=true,
- org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests"
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers.irq;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers.sched;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers.softirq;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers.statedump;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests",
+ org.eclipse.tracecompass.internal.analysis.os.linux.core.kernelanalysis.kernelevenhandlers.syscall;x-friends:="org.eclipse.tracecompass.analysis.os.linux.core.tests"
