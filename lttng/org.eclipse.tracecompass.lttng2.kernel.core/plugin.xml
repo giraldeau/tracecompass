@@ -13,8 +13,13 @@
       </type>
       <experiment
             experiment_type="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment"
-            id="lttng2.analysis.vm.VirtualMachineExperiment"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment"
             name="Virtual Machine Experiment">
+      </experiment>
+      <experiment
+            experiment_type="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.trace.CombinedExperiment"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.trace.CombinedExperiment"
+            name="Combined Experiment">
       </experiment>
    </extension>
    <extension
@@ -22,12 +27,35 @@
       <module
             analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis"
             automatic="false"
-            id="lttng2.analysis.vm.core.VirtualMachineAnalysisModule"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis"
             name="Virtual Machine Analysis">
             <tracetype
                   applies="true"
                   class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.trace.VirtualMachineExperiment">
             </tracetype>
+      </module>
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.module.CombinedAnalysis"
+            automatic="false"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.module.CombinedAnalysis"
+            name="Combined Analysis">
+	         <tracetype
+	               applies="true"
+	               class="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.trace.CombinedExperiment">
+	         </tracetype>
+      </module>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.container.ContainerAnalysisModule"
+            automatic="true"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.container"
+            name="Container Analysis">
+	         <tracetype
+	               applies="true"
+	               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
+	         </tracetype>
       </module>
    </extension>
 </plugin>

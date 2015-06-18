@@ -41,4 +41,11 @@ public interface ITmfAnalysisModuleWithStateSystems extends IAnalysisModule {
      */
     Iterable<ITmfStateSystem> getStateSystems();
 
+    /**
+     * Block the calling thread until every sub-module has finished
+     * building their state system
+     * @since 2.0
+     */
+    void waitForInitialization();
+
 }

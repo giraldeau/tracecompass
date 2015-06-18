@@ -11,6 +11,21 @@
       </perspective>
    </extension>
    <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview.VirtualMachineView"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview"
+            name="Virtual Machine View"
+            restorable="true">
+      </view>
+      <view
+            class="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.combinedview.CombinedView"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.combinedview"
+            name="Combined View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
          point="org.eclipse.ui.navigator.navigatorContent">
       <commonWizard
             associatedExtensionId="org.eclipse.linuxtools.tmf.ui.navigator.content"
@@ -25,6 +40,23 @@
             </with>
          </enablement>
       </commonWizard>
+   </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.vm.vcpuview">
+         <analysisId
+               id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.vm.module.VirtualMachineCpuAnalysis">
+         </analysisId>
+      </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.internal.lttng2.kernel.ui.views.combinedview">
+         <analysisId
+               id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.combined.module.CombinedAnalysis">
+         </analysisId>
+      </output>
    </extension>
    <extension
          point="org.eclipse.linuxtools.tmf.ui.tracetypeui">

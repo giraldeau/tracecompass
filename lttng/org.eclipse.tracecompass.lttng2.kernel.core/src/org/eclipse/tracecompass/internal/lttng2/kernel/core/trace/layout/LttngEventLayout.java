@@ -235,5 +235,4 @@ public class LttngEventLayout implements IKernelAnalysisEventLayout {
     public String fieldNextPrio() {
         return NEXT_PRIO;
     }
-
 }

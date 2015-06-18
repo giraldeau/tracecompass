@@ -161,6 +161,7 @@ public abstract class TmfStateSystemAnalysisModule extends TmfAbstractAnalysisMo
      * After this method returns, {@link #getStateSystem()} should not return
      * null anymore.
      */
+    @Override
     public void waitForInitialization() {
         try {
             fInitialized.await();

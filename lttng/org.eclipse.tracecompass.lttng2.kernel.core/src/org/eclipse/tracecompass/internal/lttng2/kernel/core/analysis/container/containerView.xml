@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="stateprovider.xsd">
+	<timeGraphView id="org.eclipse.tracecompass.internal.lttng2.kernel.core.view.containerview.xml">
+		<head>
+			<analysis id="org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.container" />
+			<label value="Container View" />
+		</head>
+		<!-- StateValues -->
+		<definedValue name="CPU_STATUS_IDLE_VALUE" value="0" color="#888888" />
+		<definedValue name="CPU_STATUS_RUNNING_VALUE" value="1" color="#95fc5f" />
+		<definedValue name="CPU_STATUS_SHARED_VALUE" value="2" color="#ff9900" />
+		<!-- Control Flow View -->
+		<entry path="Container Root">
+			<display type="self" />
+
+      <!-- The CPUs of the container -->
+			<entry path="Container CPU">
+				<display type="self" />
+
+        <entry path="*">
+          <display type="self" />
+        </entry>
+      </entry>
+
+      <!-- level 1 -->
+      <entry path="Nested Containers">
+				<display type="self" />
+
+        <entry path="Container*">
+          <display type="self" />
+
+          <!-- The CPUs of the container -->
+          <entry path="Container CPU">
+            <display type="self" />
+
+            <entry path="*">
+              <display type="self" />
+            </entry>
+          </entry>
+
+          <!-- level 2 -->
+          <entry path="Nested Containers">
+            <display type="self" />
+
+            <entry path="Container*">
+              <display type="self" />
+
+              <!-- The CPUs of the container -->
+              <entry path="Container CPU">
+                <display type="self" />
+
+                <entry path="*">
+                  <display type="self" />
+                </entry>
+              </entry>
+
+              <!-- level 3 -->
+              <entry path="Nested Containers">
+                <display type="self" />
+
+                <entry path="Container*">
+                  <display type="self" />
+
+                  <!-- The CPUs of the container -->
+                  <entry path="Container CPU">
+                    <display type="self" />
+
+                    <entry path="*">
+                      <display type="self" />
+                    </entry>
+                  </entry>
+
+                  <!-- level 4 -->
+                  <entry path="Nested Containers">
+                    <display type="self" />
+
+                    <entry path="Container*">
+                      <display type="self" />
+
+                      <!-- The CPUs of the container -->
+                      <entry path="Container CPU">
+                        <display type="self" />
+
+                        <entry path="*">
+                          <display type="self" />
+                        </entry>
+                      </entry>
+
+                      <!-- level 5 -->
+                      <entry path="Nested Containers">
+                        <display type="self" />
+
+                        <entry path="Container*">
+                          <display type="self" />
+
+                          <!-- The CPUs of the container -->
+                          <entry path="Container CPU">
+                            <display type="self" />
+
+                            <entry path="*">
+                              <display type="self" />
+                            </entry>
+                          </entry>
+
+                          <!-- level 5 -->
+                          <entry path="Nested Containers">
+                            <display type="self" />
+
+                            <entry path="Container*">
+                              <display type="self" />
+
+                            </entry>
+                          </entry>
+                        </entry>
+                      </entry>
+                    </entry>
+                  </entry>
+                </entry>
+              </entry>
+            </entry>
+          </entry>
+        </entry>
+      </entry>
+		</entry>
+	</timeGraphView>
+</tmfxml>

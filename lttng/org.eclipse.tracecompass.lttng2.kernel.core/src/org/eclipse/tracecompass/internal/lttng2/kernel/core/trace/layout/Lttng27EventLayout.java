@@ -7,6 +7,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
+ *   Alexandre Montplaisir - Initial API and implementation
  *   Sebastien Lorrain - Initial API and implementation
  ******************************************************************************/
 
@@ -21,15 +22,12 @@ package org.eclipse.tracecompass.internal.lttng2.kernel.core.trace.layout;
 @SuppressWarnings("javadoc")
 public class Lttng27EventLayout extends Lttng26EventLayout {
 
-    /**
-     * Constructor
-     */
-    protected Lttng27EventLayout() {}
+    private Lttng27EventLayout() {}
 
     public static final Lttng27EventLayout INSTANCE = new Lttng27EventLayout();
 
     // ------------------------------------------------------------------------
-    // New definitions in LTTng 2.7
+    // New event names in these versions
     // ------------------------------------------------------------------------
 
     public String fieldParentNSInum() {
