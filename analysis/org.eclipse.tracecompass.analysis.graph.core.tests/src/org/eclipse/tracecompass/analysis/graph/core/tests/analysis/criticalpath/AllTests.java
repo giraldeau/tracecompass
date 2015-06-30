@@ -10,20 +10,20 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.graph.core.tests;
+package org.eclipse.tracecompass.analysis.graph.core.tests.analysis.criticalpath;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * Master test suite for this plugin
+ * Test suite for the critical path package
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    org.eclipse.tracecompass.analysis.graph.core.tests.analysis.criticalpath.AllTests.class,
-    org.eclipse.tracecompass.analysis.graph.core.tests.graph.AllTests.class
+    TmfCriticalPathAlgoBoundedTest.class,
+    TmfCriticalPathAlgoUnboundedTest.class
 })
-public class AllAnalysisGraphCoreTests {
+public class AllTests {
 
 }
 
