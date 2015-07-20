@@ -20,7 +20,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    TracesetTest.class,
     TmfGraphTest.class,
     TmfGraphBuilderModuleTest.class
 })

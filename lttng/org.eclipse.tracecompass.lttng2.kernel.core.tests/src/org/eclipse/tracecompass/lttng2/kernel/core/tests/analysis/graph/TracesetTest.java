@@ -11,8 +11,9 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.graph.core.tests.graph;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.graph;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
@@ -66,7 +67,9 @@ public class TracesetTest {
     @Test
     public void testLoadTraces() {
         for (String name: TRACESET_NAMES) {
+            assertNotNull(name); // do not put null values in the string array!
             ITmfTrace t1 = Traceset.load(name);
+            assertNotNull(t1);
             assertTrue("validate that the trace has at least one child", t1.getChildren().size() >= 1);
         }
     }

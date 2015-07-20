@@ -11,7 +11,7 @@
  *   Geneviève Bastien - Initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.tracecompass.analysis.graph.core.tests.graph;
+package org.eclipse.tracecompass.lttng2.kernel.core.tests.analysis.graph;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -29,9 +29,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
+import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
+import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
 import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 
@@ -45,6 +49,7 @@ import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
  * @author Francis Giraldeau <francis.giraldeau@gmail.com>
  */
 @SuppressWarnings("javadoc")
+@NonNullByDefault
 public class Traceset {
 
     /**
@@ -118,10 +123,12 @@ public class Traceset {
         }
 
         @Override
-        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
-            Path name = path.getFileName();
-            if (name != null && fMatcher.matches(name)) {
-                fResults.add(path.getParent());
+        public FileVisitResult visitFile(@Nullable Path path, @Nullable BasicFileAttributes attrs) {
+            if (path != null) {
+                Path name = path.getFileName();
+                if (name != null && fMatcher.matches(name)) {
+                    fResults.add(path.getParent());
+                }
             }
             return FileVisitResult.CONTINUE;
         }
@@ -147,7 +154,7 @@ public class Traceset {
      */
     public static class PathCreationTimeComparator implements Comparator<Path> {
         @Override
-        public int compare(Path p0, Path p1) {
+        public int compare(@Nullable Path p0, @Nullable Path p1) {
             try {
                 FileTime t0 = Files.readAttributes(p0, BasicFileAttributes.class).creationTime();
                 FileTime t1 = Files.readAttributes(p1, BasicFileAttributes.class).creationTime();
@@ -215,7 +222,10 @@ public class Traceset {
      *            the event type
      * @return experiment
      */
-    public static ITmfTrace makeTraceCollectionGeneric(List<Path> paths, Class<? extends ITmfTrace> traceKlass, Class<? extends ITmfEvent> evKlass) {
+    // The main object is necessarily non null, otherwise an exception occurs.
+    // However, the compiler insists for
+    // @Nullable annotation, which is obviously wrong, isn't?
+    public static @Nullable ITmfTrace makeTraceCollectionGeneric(List<Path> paths, Class<? extends ITmfTrace> traceKlass, Class<? extends ITmfEvent> evKlass) {
         try {
             ITmfTrace main = traceKlass.newInstance();
             for (Path p : paths) {
@@ -236,13 +246,23 @@ public class Traceset {
      *            directory of traces
      * @return experiment
      */
-    public static ITmfTrace makeTraceCollectionCTF(List<Path> loc) {
+    public static @Nullable ITmfTrace makeTraceCollectionCTF(List<Path> loc) {
         return makeTraceCollectionGeneric(loc, CtfTmfTrace.class, CtfTmfEvent.class);
     }
 
-    public static ITmfTrace load(String name) {
+    /**
+     * Load a specific trace from the traceset.
+     */
+    public static @Nullable ITmfTrace load(String name) {
         List<Path> dirs = findDirectories(Paths.get(TRACESET_PATH, name), GLOB_METADATA);
         return makeTraceCollectionCTF(dirs);
     }
 
+    /**
+     * Send TmfTraceOpenSignal (required for analysis modules).
+     */
+    public static void open(ITmfTrace trace) {
+        TmfTraceOpenedSignal signal = new TmfTraceOpenedSignal(null, trace, null);
+        ((TmfTrace) trace).traceOpened(signal);
+    }
 }

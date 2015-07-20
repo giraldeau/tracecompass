@@ -26,11 +26,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.tracecompass.analysis.graph.core.base.IGraphWorker;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge;
+import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
-import org.eclipse.tracecompass.analysis.graph.core.base.TmfEdge.EdgeType;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
+import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecutionGraph;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
@@ -102,12 +103,11 @@ public class LttngExecutionGraphTest {
 
         Set<IGraphWorker> workers = graph.getWorkers();
         assertEquals(2, workers.size());
-        for (IGraphWorker worker: workers) {
+        for (IGraphWorker worker : workers) {
             assertTrue(worker instanceof LttngWorker);
             LttngWorker lttngWorker = (LttngWorker) worker;
-            switch(lttngWorker.getHostThread().getTid()) {
-            case 1:
-            {
+            switch (lttngWorker.getHostThread().getTid()) {
+            case 1: {
                 List<TmfVertex> nodesOf = graph.getNodesOf(lttngWorker);
                 assertEquals(4, nodesOf.size());
                 /* Check first vertice has outgoing edge preempted */
@@ -152,8 +152,7 @@ public class LttngExecutionGraphTest {
                 assertNull(v.getEdge(EdgeDirection.OUTGOING_HORIZONTAL_EDGE));
             }
                 break;
-            case 2:
-            {
+            case 2: {
                 List<TmfVertex> nodesOf = graph.getNodesOf(lttngWorker);
                 assertEquals(4, nodesOf.size());
                 /* Check first vertice has outgoing edge preempted */
@@ -204,4 +203,14 @@ public class LttngExecutionGraphTest {
             }
         }
     }
+
+    @Test
+    public void testCreateGraph() {
+        ITmfTrace trace = Traceset.load(Traceset.TRACESET_WK_RPC_100MS_K);
+        Traceset.open(trace);
+        LttngKernelExecutionGraph mod = TmfTraceUtils.getAnalysisModuleOfClass(trace,
+                LttngKernelExecutionGraph.class, LttngKernelExecutionGraph.ANALYSIS_ID);
+        assertNotNull(mod);
+    }
+
 }
