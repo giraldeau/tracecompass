@@ -235,6 +235,7 @@ public class Traceset {
             }
             return main;
         } catch (InstantiationException | IllegalAccessException | TmfTraceException e) {
+            System.err.println(e.getClass());
             throw new RuntimeException(e.getMessage());
         }
     }

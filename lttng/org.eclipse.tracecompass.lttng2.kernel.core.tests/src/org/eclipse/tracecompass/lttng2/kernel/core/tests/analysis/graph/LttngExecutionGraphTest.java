@@ -18,6 +18,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -31,18 +34,25 @@ import org.eclipse.tracecompass.analysis.graph.core.base.TmfGraph;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex;
 import org.eclipse.tracecompass.analysis.graph.core.base.TmfVertex.EdgeDirection;
 import org.eclipse.tracecompass.analysis.graph.core.building.TmfGraphBuilderModule;
-import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.building.LttngKernelExecutionGraph;
 import org.eclipse.tracecompass.internal.lttng2.kernel.core.analysis.graph.model.LttngWorker;
 import org.eclipse.tracecompass.lttng2.kernel.core.tests.Activator;
+import org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace;
 import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModuleHelper;
+import org.eclipse.tracecompass.tmf.core.analysis.TmfAnalysisManager;
 import org.eclipse.tracecompass.tmf.core.event.TmfEvent;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfTraceException;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceOpenedSignal;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceUtils;
+import org.eclipse.tracecompass.tmf.ctf.core.event.CtfTmfEvent;
+import org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace;
 import org.eclipse.tracecompass.tmf.tests.stubs.trace.xml.TmfXmlTraceStub;
 import org.junit.Test;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Multimap;
 
 /**
  * Test that the execution graph is built correctly
@@ -204,13 +214,88 @@ public class LttngExecutionGraphTest {
         }
     }
 
+    /**
+     * @author francis
+     *
+     */
+    public static class IterCount implements Function<Iterable<?>, Integer> {
+
+        @Override
+        public Integer apply(Iterable<?> input) {
+            int x = 0;
+            Iterator<?> iterator = input.iterator();
+            while(iterator.hasNext()) {
+                iterator.next();
+                x++;
+            }
+            return x;
+        }
+
+    }
+
     @Test
     public void testCreateGraph() {
-        ITmfTrace trace = Traceset.load(Traceset.TRACESET_WK_RPC_100MS_K);
-        Traceset.open(trace);
+//        ITmfTrace trace = Traceset.load(Traceset.TRACESET_WK_RPC_100MS_K);
+//        Traceset.open(trace);
+//        Multimap<String, IAnalysisModuleHelper> modules = TmfAnalysisManager.getAnalysisModules();
+//        for (Entry<String, IAnalysisModuleHelper> entry: modules.entries()) {
+//            System.out.println(entry);
+//        }
+//        System.out.println(modules);
+        /*
+        for (IAnalysisModuleHelper helper : modules.values()) {
+            try {
+                IAnalysisModule module = helper.newModule(this);
+
+
         LttngKernelExecutionGraph mod = TmfTraceUtils.getAnalysisModuleOfClass(trace,
                 LttngKernelExecutionGraph.class, LttngKernelExecutionGraph.ANALYSIS_ID);
         assertNotNull(mod);
+        */
+        Path path = Paths.get(Traceset.TRACESET_PATH, Traceset.TRACESET_WK_RPC_100MS_K);
+        List<Path> dirs = Traceset.findDirectories(path, Traceset.GLOB_METADATA);
+
+        /* can't instantiate TmfTrace class, it is an abstract class */
+        //ITmfTrace tmf = Traceset.makeTraceCollectionGeneric(dirs, TmfTrace.class, TmfEvent.class);
+        ITmfTrace ctf = Traceset.makeTraceCollectionGeneric(dirs, CtfTmfTrace.class, CtfTmfEvent.class);
+        ITmfTrace ltt = Traceset.makeTraceCollectionGeneric(dirs, LttngKernelTrace.class, CtfTmfEvent.class);
+
+        /*
+        LttngKernelExecutionGraph module = new LttngKernelExecutionGraph();
+        module.getGraph();
+        */
+
+        /*
+    LttngKernelExecutionGraph mod = TmfTraceUtils.getAnalysisModuleOfClass(t,
+            LttngKernelExecutionGraph.class, LttngKernelExecutionGraph.ANALYSIS_ID);
+        System.out.println(t.getClass().getSimpleName() + ": " + mod);
+        */
+
+        /*
+         * Pourquoi le nombre de modules n'est pas le même pour getAnalysisModules() et getAnalysisModuleOfClass()?
+         * question de signal. les traces enfants ne reçoivent pas le signal lorsque la trace parent est ouverte.
+         *
+         * execution graph analysis module: org.eclipse.tracecompass.lttng2.kernel.core.execgraph
+         */
+        Multimap<String, IAnalysisModuleHelper> analysisModules = TmfAnalysisManager.getAnalysisModules();
+
+        IterCount count = new IterCount();
+        System.out.println("available analysis modules: " + analysisModules.size());
+        for (ITmfTrace root: new ITmfTrace[] { ctf, ltt }) {
+            Traceset.open(root);
+            System.out.println("root analysis modules: " + count.apply(root.getAnalysisModules()));
+            for (IAnalysisModule module : root.getAnalysisModules()) {
+                System.out.println(module);
+            }
+            List<ITmfTrace> children = root.getChildren(ITmfTrace.class);
+            for (ITmfTrace child: children) {
+                Traceset.open(child);
+                System.out.println("child analysis modules: " + count.apply(child.getAnalysisModules()));
+                for (IAnalysisModule module : child.getAnalysisModules()) {
+                    System.out.println("    " + module);
+                }
+            }
+        }
     }
 
 }
