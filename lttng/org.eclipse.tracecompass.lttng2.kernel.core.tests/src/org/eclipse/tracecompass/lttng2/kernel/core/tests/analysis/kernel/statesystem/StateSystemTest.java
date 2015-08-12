@@ -383,6 +383,15 @@ public abstract class StateSystemTest {
     public void testFullQueryThorough() {
         try {
             List<ITmfStateInterval> state = fixture.queryFullState(interestingTimestamp1);
+
+            for (int i = 0; i < state.size(); i++) {
+                /* Test each component of the intervals */
+                assertSoftEquals("start", getStartTimes(i), state.get(i).getStartTime());
+                assertSoftEquals("end", getEndTimes(i), state.get(i).getEndTime());
+                assertSoftEquals("attribute", i, state.get(i).getAttribute());
+                assertSoftEquals("value", getStateValues(i), state.get(i).getStateValue());
+            }
+
             assertEquals(TestValues.size, state.size());
 
             for (int i = 0; i < state.size(); i++) {
@@ -395,6 +404,13 @@ public abstract class StateSystemTest {
 
         } catch (StateSystemDisposedException e) {
             fail();
+        }
+    }
+
+    /* This is just debug */
+    private static void assertSoftEquals(String string, Object exp, Object act) {
+        if (!exp.equals(act)) {
+            System.out.println(String.format("assert failed: %s exp=%d act=%d", string, exp, act));
         }
     }
 
