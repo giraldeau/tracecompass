@@ -63,4 +63,17 @@
          </analysisId>
       </parameterProvider>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.internal.lttng2.kernel.ui.ftrace.FtraceAnalysis"
+            automatic="false"
+            id="org.eclipse.tracecompass.lttng2.kernel.ui.ftrace"
+            name="org.eclipse.tracecompass.lttng2.kernel.ui.ftrace">
+         <tracetype
+               applies="true"
+               class="org.eclipse.tracecompass.lttng2.kernel.core.trace.LttngKernelTrace">
+         </tracetype>
+      </module>
+   </extension>
 </plugin>
