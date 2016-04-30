@@ -65,7 +65,7 @@ public class LttngFtraceCallStackProvider extends CallStackStateProvider {
     public LttngFtraceCallStackProvider(ITmfTrace trace) {
         super(trace);
         funcEntryEvents = ImmutableSet.of("fgraph_entry"); //$NON-NLS-1$
-        funcExitEvents = ImmutableSet.of("fgraph_exit"); //$NON-NLS-1$
+        funcExitEvents = ImmutableSet.of("fgraph_return"); //$NON-NLS-1$
     }
 
     // ------------------------------------------------------------------------
