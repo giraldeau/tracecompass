@@ -2079,6 +2079,37 @@ Hover the cursor over a line of the chart and a tooltip will pop up with the fol
 
 [[Image:images/kernelMemoryUsage/KernelMemoryUsageChart.png]]
 
+== Kernel Wait Analysis ==
+
+TraceCompass can recovers wait causes of local and distributed processes using operating system events. The analysis highlights the tasks and devices causing wait. Wait cause recovery is recursive, comprise all tasks running on the system and works across computers using packet trace synchronization. 
+
+The analysis details are available in the paper [http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7294678&isnumber=4359390 Wait analysis of distributed systems using kernel tracing].
+
+=== Prerequisite ===
+ 
+The analysis requires a Linux kernel trace. Additional instrumentation may be required for specific kernel version and for distributed tracing. This instrumentation is available in [https://github.com/giraldeau/lttng-modules/tree/addons LTTng modules addons] on GitHub. 
+
+The required events are:
+* '''sched_switch, sched_wakeup''': Scheduling events indicates when a process is blocked and the wake-up event indicates the task or resource that unblocked the task. For kernel versions comprised between 3.8 and 4.1, the event '''sched_ttwu''' (which stands for Try To Wake-Up) is provided for backward compatibility in LTTng modules addons. 
+* '''IRQ, SoftIRQ and IPI''': Interrupt events are required to distinguish the context of the wake-up. When a wake-up occurs inside an interrupt handler, it must be associated with the device causing the interrupt and not the interrupted task. For that reason, interrupt entry and exit events are required.
+* '''inet_sock_local_in, inet_sock_local_out''': The network events record a subset of TCP/IP packet header using a netfilter hook in the kernel. The send and receive events are matched to show the communication between distributed processes. Network events are mandatory for analyzing wait in TCP/IP programs, whether they are executing locally or on different computers. They also allows to automaticaly synchronize traces with different time base with microsecond precision.
+
+To analyze a distributed program, all computers involved in the processing must be traced simultaneously. The LTTng Tracer Control of TraceCompass does not support distributed tracing at the moment. It is suggested to use [https://github.com/giraldeau/lttng-cluster lttng-cluster] command line tool. This tool control tracing on multiple computers using SSH. For more details, refer to the lttng-cluster documentation.
+
+// FIXME: the trace package should be moved to eclipse and/or stable server, where to put it?
+For the rest of the documentation, the [http://secretaire.dorsal.polymtl.ca/~fgiraldeau/traces/django-vote.tar.gz Django trace] is used as an example. [https://www.djangoproject.com/ Django] is a popular Web framework with an object relational mappper. The application is the [https://docs.djangoproject.com/en/1.9/intro/tutorial01/ Django Poll app tutorial]. The trace was recorded on three computers, namely the client (implemented with Python Mechanize), the Web server (Apache with WSGI) and the database server (PostgreSQL). The client simulates a vote in the poll.
+
+=== Setup the Tracing Experiment ===
+
+To open all three traces simultaneously, we first create an experiment containing these traces and then synchronize the traces, such that they have a common time base.
+
+# Open the [#LTTng_Kernel_Perspective LTTng Kernel] perspective
+# Create a new tracing project. Select '''File > New > Tracing > Tracing Project''', choose a name and click '''Finish'''. 
+# Under the created tracing project, right-click on '''Traces''' and select '''Import Trace Package...'''. In the import dialog, click on '''Browse''', select the file '''django-vote.tar.gz''' and click '''Finish'''. Three traces should be imported. 
+# Right-click on '''Experiments''', select '''New...''' and enter a name for the experiment, such as '''django'''. 
+# Right-click on the '''django''' experiment and click on '''Select Traces...'''. In the dialog, check the three traces '''django-client''', '''django-httpd''' and '''django-db'''. These traces will appear below the experiment. Opening the experiment at this time will show the clock skew between traces.
+# To synchronize the traces, right-click on the '''django''' experiment and select '''Synchronize Traces'''. Trace entries will be created with modified timestamps. The traces are not actually copied on disk, merely.
+
 == LTTng Kernel Events Editor ==
 
 The LTTng Kernel Events editor '''is''' the plain TMF [[#Events_Editor | Events Editor]], except that it provides its own specialized viewer to replace the standard one. In short, it has exactly the same behaviour but the layout is slightly different:
