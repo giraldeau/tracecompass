@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 
 import org.eclipse.tracecompass.common.core.NonNullUtils;
@@ -319,7 +320,7 @@ public class ProfileTraversal {
         // Tree 1:
         int level = 0;
         queue1.add(root1);
-        Node<T> pointerParent =  root1.getParent();
+        Node<T> pointerParent = root1.getParent();
         while (!queue1.isEmpty()) {
             Node<T> current = queue1.poll();
             if (current.getParent() != pointerParent) {
@@ -341,7 +342,7 @@ public class ProfileTraversal {
         // Tree 1:
         level = 0;
         queue2.add(root2);
-        pointerParent =  root2.getParent();
+        pointerParent = root2.getParent();
         while (!queue2.isEmpty()) {
             Node<T> current = queue2.poll();
             if (current.getParent() != pointerParent) {
@@ -390,17 +391,18 @@ public class ProfileTraversal {
 
         @Override
         public int hashCode() {
-            int A = label.hashCode();
-            int B = level;
-            return (A * B) * 255;
+            return Objects.hash(level, label);
         }
 
-        public boolean equals(KeyTree k) {
-            if (this.getLevel() == k.getLevel()) {
-                if (this.getLabel() == k.getLabel()) {
-                    return true;
-                }
-
+        @Override
+        public boolean equals(Object k) {
+            if (k == null) {
+                return false;
+            }
+            if (k instanceof KeyTree) {
+                KeyTree other = (KeyTree) k;
+                return this.getLevel() == other.getLevel() &&
+                    this.getLabel().equals(other.getLabel());
             }
             return false;
         }
