@@ -1,6 +1,7 @@
 package org.eclipse.tracecompass.tmf.core.tests.profile;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -99,7 +100,7 @@ public class TestProfileTree {
             try {
 
                 // String content = "This is the content to write into file";
-                String fileName = new String("/home/frank/Desktop/");
+                String fileName = new String("/tmp/");
                 fileName = fileName.concat(name); //
                 File file = new File(fileName); // "/home/frank/Desktop/tree.gv");
 
@@ -284,7 +285,7 @@ public class TestProfileTree {
 
         Node<TestData> b = ProfileTraversal.levelOrderTraversalComparator2(fRoot, fRoot2);
         ProfileTraversal.levelOrderTraversal(b, visitor);
-        visitor.print("treeOutput.gv");
+        visitor.print("treeOutput.dot");
 
     }
 
@@ -305,16 +306,16 @@ public class TestProfileTree {
 
         System.out.println("Comparison test x");
         ProfileTraversal.levelOrderTraversal(fRoot, visitorInput1);
-        visitorInput1.print("treeInput1.gv");
+        visitorInput1.print("treeInput1.dot");
         // visitor.reset();
 
         ProfileTraversal.levelOrderTraversal(fRoot2, visitorInput2);
-        visitorInput2.print("treeInput2.gv");
+        visitorInput2.print("treeInput2.dot");
         // visitor.reset();
 
         Node<TestData> b = ProfileTraversal.levelOrderTraversalComparator2(fRoot, fRoot2);
         ProfileTraversal.levelOrderTraversal(b, visitorOutput);
-        visitorOutput.print("treeOutput.gv");
+        visitorOutput.print("treeOutput.dot");
 
     }
 
@@ -323,122 +324,75 @@ public class TestProfileTree {
      *
      * @throws Exception
      */
+    Integer fCount = 0;
+    ArrayList<String> fAct = new ArrayList<>();
+
     @Test
     public void testCreateTree() throws Exception {
-
-        GraphvizVisitor visitor1 = new GraphvizVisitor();
-        GraphvizVisitor visitor2 = new GraphvizVisitor();
-        GraphvizVisitor visitor3 = new GraphvizVisitor();
-
-        // Create the events:
-        String event1[] = { "20", "A", "B","D" };
-        String event2[] = { "10", "C" };
-        String event3[] = { "10", "A", "B", "D" };
-        Node<TestData> root1 = createTree(event1, event2);
-        Node<TestData> root2 = createTree(event3, null);
-        // merge(pointer.getParent(), event4);
-
-        ProfileTraversal.levelOrderTraversal(root1, visitor1);
-        visitor1.print("treeInput1.gv");
-
-        ProfileTraversal.levelOrderTraversal(root2, visitor2);
-        visitor2.print("treeInput2.gv");
-
-        Node<TestData> b = ProfileTraversal.levelOrderTraversalComparatorHash(root2, root1);
-        ProfileTraversal.levelOrderTraversal(b, visitor3);
-        visitor3.print("treeOutput.gv");
-    }
-
-    // This function creates a tree from a basic and then add samples
-    public Node<TestData> createTree(String[] stringCreating, String[] event2) throws Exception {
-
-        // Create the events:
-        String event1[] = stringCreating;
-        // String event2[] = { "10", "baz" };
-        // String event3[] = { "10", "F", "B", "D", "E" };
-        // String event4[] = { "10", "F", "G", "I", "H" };
-
-        String creation[] = null;
-        creation = event1;
-        // Put it on the tree
-        int info = Integer.parseInt(creation[0]);
-        Node<TestData> pointer = null;
-        Node<TestData> temp = null;
-        Node<TestData> n = Node.create(new TestData(info, creation[creation.length - 1])); // create_the_last_one
-        // Create the tree backwards
-        temp = n;
-        pointer = n;
-
-        for (int i = 2; i <= creation.length - 1; i++) {
-            pointer = temp;
-            temp = Node.create(new TestData(info, creation[creation.length - i])); // createEachNode
-            pointer.setParent(temp);
-            temp.addChild(pointer);
-        }
-
-        // Put the root:
+        GraphvizVisitor dot = new GraphvizVisitor();
         Node<TestData> root = Node.create(new TestData(0, "root"));
-        root.addChild(pointer.getParent());
-        pointer.getParent().setParent(root);
 
-        if (event2 != null) {
-            addSample(pointer.getParent(), event2);
-            // merge(pointer.getParent(), event2);
-            // merge(pointer.getParent(), event4);
+        // Create the events:
+        String trace[][] = {
+                { "F", "B","A" },
+                { "F", "B","D", "C" },
+                { "F", "B","D", "E" },
+                { "F", "G","I", "H" },
+        };
+
+        for (String[] event: trace) {
+            addSample(root, event);
         }
 
-        return root;
+        ProfileTraversal.levelOrderTraversal(root, dot);
+
+        fAct.clear();
+        ProfileTraversal.levelOrderTraversal(root, new IProfileVisitor<TestData>() {
+            @Override
+            public void visit(Node<TestData> node) {
+                fAct.add(node.getNodeLabel());
+                fCount++;
+            }
+        });
+
+        assertEquals("wrong number of nodes in the tree", 10, (long) fCount);
+
+        String exp[] = { "root", "F", "B", "G", "A", "D", "I", "C", "E", "H" };
+        assertArrayEquals(exp, fAct.toArray());
+
+        dot.print("samples1.dot");
     }
 
     /**
-     * This function merges a tree with a String["10", "A","B","C"]
+     * This function add a sample in the tree
      */
-    public Node<TestData> addSample(Node<TestData> root, String[] event2) {
-        // String [] = {"10","F","B","A"}
-        // First node addition
-        Node<TestData> temp = null;
-        Node<TestData> parent = null;
-        Node<TestData> pointer = null;
+    public void addSample(Node<TestData> root, String[] event) {
+        // for each stack level
 
-        parent = root;
-        boolean created = false;
-        String aux[] = null;
-        aux = event2;
-        String label = aux[1]; // "F"
-        int info = Integer.parseInt(aux[0]);
-        System.out.println(parent);
+        Node<TestData> current = root;
+        for (String label: event) {
 
-        if (label.equals(parent.getNodeLabel())) {
-            parent.getProfileData().addWeight(info);
-            pointer = parent;
-        } else {
-            temp = Node.create(new TestData(info, label));
-            temp.setParent(parent.getParent());
-            parent.getParent().addChild(temp);
-            pointer = temp;
-        }
-
-        // n node:
-        info = Integer.parseInt(aux[0]);
-        for (int i = 2; i < aux.length; i++) {
-            label = aux[i]; // "A"
-            created = false;
-            for (Node<TestData> node : pointer.getChildren()) {
-                System.out.println(node);
-                if (label.equals(node.getNodeLabel())) {
-                    node.getProfileData().addWeight(info);
-                    created = true;
-                    pointer = node;
+            // search for a matching node in the current level
+            Node<TestData> match = null;
+            for (Node<TestData> child : current.getChildren()) {
+                if (label.equals(child.getNodeLabel())) {
+                    match = child;
+                    break;
                 }
             }
-            if (!created) {
-                temp = Node.create(new TestData(info, label));
-                temp.setParent(pointer);
-                pointer.addChild(temp);
-                pointer = temp;
+
+            // if the node does not exist, create it and set its parent
+            if (match == null) {
+                match = Node.create(new TestData(0, label));
+                current.addChild(match);
             }
+
+            // increase the weight
+            match.getProfileData().addWeight(1);
+
+            // update current node
+            current = match;
         }
-        return pointer;
     }
 
     /**
